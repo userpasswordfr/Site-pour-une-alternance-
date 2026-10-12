@@ -1,0 +1,12 @@
+{
+  "recherches": [
+    {
+      "nom": "Développeur web à Lyon",
+      "romes": ["M1805", "E1205"],
+      "ville": "Lyon",
+      "rayon_km": 30
+    }
+  ],
+  "creer_issue_nouvelles_offres": true,
+  "max_offres_par_issue": 30
+}
