@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ma recherche d'alternance</title>
+  <meta name="description" content="Tableau de bord personnel pour trouver une alternance : recherche filtrée, entreprises, plateformes, suivi des candidatures et alertes.">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">A</span>
+      <div>
+        <h1>Ma recherche d'alternance</h1>
+        <p class="muted small" id="maj">Chargement des offres…</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="recherche" class="active">Recherche</button>
+      <button role="tab" data-tab="entreprises">Entreprises &amp; plateformes</button>
+      <button role="tab" data-tab="candidatures">Mes candidatures <span class="badge" id="badge-cand" hidden></span></button>
+      <button role="tab" data-tab="alertes">Alertes <span class="badge alert" id="badge-new" hidden></span></button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- RECHERCHE -->
+    <section id="tab-recherche" class="tab active">
+      <div class="layout">
+        <details class="panel filters" id="filtres-box" open>
+          <summary><h2>Filtrer</h2></summary>
+          <form id="filtres" autocomplete="off">
+          <label>Mots-clés
+            <input name="q" type="search" placeholder="développeur, marketing, RH…">
+          </label>
+          <label>Ville
+            <input name="ville" type="text" placeholder="Paris, Lyon…" list="villes-connues">
+            <datalist id="villes-connues"></datalist>
+          </label>
+          <label>Distance max
+            <select name="rayon">
+              <option value="">Peu importe</option>
+              <option value="10">10 km</option>
+              <option value="20">20 km</option>
+              <option value="30">30 km</option>
+              <option value="50">50 km</option>
+              <option value="100">100 km</option>
+            </select>
+          </label>
+          <label>Type de contrat
+            <select name="contrat">
+              <option value="">Tous</option>
+              <option value="apprentissage">Apprentissage</option>
+              <option value="professionnalisation">Professionnalisation</option>
+            </select>
+          </label>
+          <label>Niveau visé
+            <select name="niveau">
+              <option value="">Tous</option>
+              <option value="3">CAP, BEP</option>
+              <option value="4">Bac</option>
+              <option value="5">Bac+2 (BTS, DUT)</option>
+              <option value="6">Bac+3 (Licence, BUT)</option>
+              <option value="7">Bac+5 (Master, ingénieur)</option>
+            </select>
+          </label>
+          <label>Télétravail
+            <select name="teletravail">
+              <option value="">Peu importe</option>
+              <option value="onsite">Sur site</option>
+              <option value="hybrid">Hybride</option>
+              <option value="remote">Télétravail complet</option>
+            </select>
+          </label>
+          <label>Source
+            <select name="source" id="sel-source">
+              <option value="">Toutes</option>
+            </select>
+          </label>
+          <label>Publiée depuis
+            <select name="depuis">
+              <option value="">Toujours</option>
+              <option value="1">24 heures</option>
+              <option value="3">3 jours</option>
+              <option value="7">7 jours</option>
+              <option value="30">30 jours</option>
+            </select>
+          </label>
+          <label>Trier par
+            <select name="tri">
+              <option value="recent">Plus récentes</option>
+              <option value="distance">Plus proches</option>
+              <option value="entreprise">Entreprise (A→Z)</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" name="suivies"> Entreprises suivies uniquement</label>
+          <label class="check"><input type="checkbox" name="masquerPostulees" checked> Masquer les offres déjà dans mes candidatures</label>
+          <div class="row wrap">
+            <button type="button" id="btn-reset" class="ghost">Réinitialiser</button>
+            <button type="button" id="btn-save-alert">Créer une alerte</button>
+          </div>
+          </form>
+        </details>
+
+        <div class="results">
+          <div class="results-head">
+            <p id="nb-resultats" class="muted"></p>
+          </div>
+          <div id="liste-offres" class="cards"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTREPRISES & PLATEFORMES -->
+    <section id="tab-entreprises" class="tab">
+      <div class="panel">
+        <h2>Chercher sur toutes les plateformes</h2>
+        <p class="muted">Les liens reprennent tes mots-clés et ta ville de l'onglet Recherche. LinkedIn, Indeed et les autres sites n'autorisent pas la récupération automatique de leurs offres, alors chaque lien ouvre directement la bonne recherche chez eux.</p>
+        <div class="row wrap">
+          <label class="grow">Mots-clés <input id="plat-q" type="search" placeholder="ex. développeur web"></label>
+          <label class="grow">Ville <input id="plat-ville" type="text" placeholder="ex. Lyon"></label>
+        </div>
+        <div id="plateformes" class="platforms"></div>
+      </div>
+
+      <div class="panel">
+        <div class="row between wrap">
+          <h2>Entreprises qui publient des offres</h2>
+          <input id="ent-q" type="search" placeholder="Filtrer les entreprises…" class="compact">
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Entreprise</th><th>Offres</th><th>Lieux</th><th>Sources</th><th></th></tr></thead>
+            <tbody id="table-entreprises"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Entreprises qui recrutent en alternance sans offre publiée</h2>
+        <p class="muted">Repérées par La bonne alternance comme susceptibles de recruter : idéal pour une candidature spontanée.</p>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Entreprise</th><th>Secteur</th><th>Lieu</th><th></th></tr></thead>
+            <tbody id="table-recruteurs"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Entreprises que je suis</h2>
+        <p class="muted">Tu es prévenu en priorité quand une entreprise suivie publie une nouvelle offre. Ajoute aussi la page carrières de celles que tu vises.</p>
+        <form id="form-suivie" class="row wrap">
+          <input name="nom" required placeholder="Nom de l'entreprise" class="grow">
+          <input name="url" type="url" placeholder="Page carrières (optionnel)" class="grow">
+          <button type="submit">Suivre</button>
+        </form>
+        <ul id="liste-suivies" class="chips"></ul>
+      </div>
+    </section>
+
+    <!-- CANDIDATURES -->
+    <section id="tab-candidatures" class="tab">
+      <div id="stats" class="stats"></div>
+
+      <div class="panel">
+        <h2>Ajouter une candidature</h2>
+        <p class="muted">Pour une offre trouvée sur LinkedIn, Indeed ou ailleurs. Les offres du site s'ajoutent en un clic depuis l'onglet Recherche.</p>
+        <form id="form-cand" class="grid-form">
+          <label>Poste <input name="titre" required></label>
+          <label>Entreprise <input name="entreprise" required></label>
+          <label>Plateforme
+            <select name="source">
+              <option>LinkedIn</option><option>Indeed</option><option>Welcome to the Jungle</option>
+              <option>HelloWork</option><option>France Travail</option><option>La bonne alternance</option>
+              <option>Site de l'entreprise</option><option>Candidature spontanée</option><option>Autre</option>
+            </select>
+          </label>
+          <label>Lien de l'offre <input name="url" type="url" placeholder="https://"></label>
+          <label>Date <input name="date" type="date"></label>
+          <label>Statut <select name="statut" class="sel-statut"></select></label>
+          <label class="full">Notes <textarea name="notes" rows="2" placeholder="Contact, salaire, rythme école/entreprise…"></textarea></label>
+          <div class="full row end"><button type="submit">Ajouter</button></div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="row between wrap">
+          <h2>Suivi</h2>
+          <div class="row wrap">
+            <select id="cand-filtre" class="compact"><option value="">Tous les statuts</option></select>
+            <button type="button" class="ghost" id="btn-export">Exporter</button>
+            <label class="ghost button">Importer<input type="file" id="file-import" accept="application/json" hidden></label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Poste</th><th>Entreprise</th><th>Plateforme</th><th>Date</th><th>Statut</th><th>Notes</th><th></th></tr></thead>
+            <tbody id="table-cand"></tbody>
+          </table>
+        </div>
+        <p class="muted small">Tes candidatures sont enregistrées dans ce navigateur. Pense à exporter régulièrement pour garder une sauvegarde ou les retrouver sur un autre appareil.</p>
+      </div>
+    </section>
+
+    <!-- ALERTES -->
+    <section id="tab-alertes" class="tab">
+      <div class="panel">
+        <h2>Notifications</h2>
+        <p id="notif-etat" class="muted"></p>
+        <div class="row wrap">
+          <button type="button" id="btn-notif">Activer les notifications</button>
+          <label class="inline">Vérifier toutes les
+            <select id="sel-intervalle" class="compact">
+              <option value="15">15 min</option>
+              <option value="30">30 min</option>
+              <option value="60">1 heure</option>
+            </select>
+          </label>
+          <button type="button" class="ghost" id="btn-check">Vérifier maintenant</button>
+        </div>
+        <p class="muted small">Les notifications du navigateur fonctionnent tant que le site est ouvert dans un onglet. Pour être prévenu par e-mail même site fermé, la synchronisation automatique crée une « issue » GitHub à chaque nouvelle offre, et GitHub t'envoie un e-mail (voir le README).</p>
+      </div>
+
+      <div class="panel">
+        <h2>Mes alertes</h2>
+        <p class="muted">Une alerte reprend les filtres de l'onglet Recherche. Sans alerte, tu es prévenu pour toutes les nouvelles offres.</p>
+        <ul id="liste-alertes" class="alerts"></ul>
+      </div>
+
+      <div class="panel">
+        <div class="row between wrap">
+          <h2>Nouvelles offres</h2>
+          <button type="button" class="ghost" id="btn-vu">Tout marquer comme vu</button>
+        </div>
+        <div id="liste-nouvelles" class="cards"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="assets/app.js"></script>
+</body>
+</html>
