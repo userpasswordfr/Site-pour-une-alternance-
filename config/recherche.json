@@ -1,15 +1,9 @@
 {
   "recherches": [
     {
-      "nom": "Développement web autour de Paris",
-      "romes": ["M1805"],
-      "ville": "Paris",
-      "rayon_km": 30
-    },
-    {
-      "nom": "Marketing et communication autour de Paris",
-      "romes": ["E1103", "M1705"],
-      "ville": "Paris",
+      "nom": "Développeur web à Lyon",
+      "romes": ["M1805", "E1205"],
+      "ville": "Lyon",
       "rayon_km": 30
     }
   ],

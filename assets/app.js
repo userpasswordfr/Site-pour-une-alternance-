@@ -22,6 +22,8 @@ const STATUTS = [
   { id: 'accepte', label: 'Acceptée' },
 ];
 const JOURS_AVANT_RELANCE = 7;
+// Réglages de départ : filtres à la première visite et mots-clés envoyés aux plateformes.
+const PAR_DEFAUT = { filtres: { ville: 'Lyon', rayon: '30' }, motsClesPlateformes: 'développeur web' };
 
 const state = {
   offres: [],
@@ -263,7 +265,7 @@ const PLATEFORMES = [
 function majPlateformes(depuisRecherche = true) {
   if (depuisRecherche) {
     const f = lireFiltres();
-    $('#plat-q').value = f.q;
+    $('#plat-q').value = f.q || PAR_DEFAUT.motsClesPlateformes;
     $('#plat-ville').value = f.ville;
   }
   const q = $('#plat-q').value.trim();
@@ -590,7 +592,7 @@ function brancherEvenements() {
 (async function init() {
   brancherEvenements();
   if (window.matchMedia('(max-width: 820px)').matches) $('#filtres-box').open = false;
-  ecrireFiltres(store.get('filtres', {}));
+  ecrireFiltres(store.get('filtres', PAR_DEFAUT.filtres));
   $('#sel-intervalle').value = String(store.get('intervalle', 30));
   ouvrirOnglet(store.get('onglet', 'recherche'));
   await verifierNouvelles(false);
